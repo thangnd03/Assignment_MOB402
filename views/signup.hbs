@@ -1,5 +1,10 @@
 <div class="container">
   <div class="row col-6 m-auto mt-5 border border-secondary rounded-2">
+    {{#if err}}
+    <div class="alert alert-danger" role="alert">
+      {{err}}
+    </div>
+    {{/if}}
     <h2 class="text-center p-2 bg-success text-white">Đăng ký</h2>
     <form method="post">
       <div class="mb-3">

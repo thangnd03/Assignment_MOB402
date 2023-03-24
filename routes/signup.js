@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { checkLogin, requireLogin } = require('../middleware/auth');
 
-// Đăng nhập
+// Đăng ký
 router.get('/', (req, res) => {
     res.render('signup', { layout: 'form' });
 });
