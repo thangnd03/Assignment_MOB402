@@ -1,0 +1,33 @@
+<div class="container">
+
+  <h2 style="text-align: center">DANH SÁCH THỂ LOẠI</h2>
+
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th scope="col-1">STT</th>
+        <th scope="col-4">Email</th>
+        <th scope="col-4">Tên</th>
+        <th scope="col-2">Hình Ảnh</th>
+        <th scope="col-1"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each listUser}}
+        <tr>
+          <th scope="row">{{sum @index 1}}</th>
+          <td>{{this.email}}</td>
+          <td>{{this.name}}</td>
+          <td><img src="{{this.image}}" width="90" alt="ảnh " /></td>
+          <td>
+
+            <a class="btn btn-primary" href="/user/edit/{{this.id}}">Sửa</a>
+            <a class="btn btn-danger" href="/user/delete/{{this.id}}">Xóa</a>
+
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+</div>

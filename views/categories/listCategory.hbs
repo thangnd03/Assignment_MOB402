@@ -1,0 +1,31 @@
+<div class="container">
+
+  <h2 style="text-align: center">DANH SÁCH THỂ LOẠI</h2>
+
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th scope="col-2">STT</th>
+        <th scope="col-4">Mã thể loại</th>
+        <th scope="col-4">Tên thể loại</th>
+        <th scope="col-1"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each listCategory}}
+        <tr>
+          <th scope="row">{{sum @index 1}}</th>
+          <td>{{this.id}}</td>
+          <td>{{this.name}}</td>
+          <td>
+
+            <a class="btn btn-primary" href="/category/edit/{{this.id}}">Sửa</a>
+            <a class="btn btn-danger" href="/category/delete/{{this.id}}">Xóa</a>
+
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+</div>

@@ -1,0 +1,51 @@
+<div class="container">
+  <div class="row col-6 m-auto mt-5 border border-secondary rounded-2">
+    <h2 class="text-center p-2 bg-success text-white">Đăng ký</h2>
+    <form method="post">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label for="pass" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="pass"
+          name="pass"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="name" class="form-label">Fullname</label>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          name="name"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Ảnh</label>
+        <input type="file" name="image" accept="image/*" id="image">
+
+      </div>
+
+      <button type="submit" class="btn btn-success col-12 fs-5">Đăng ký</button>
+    </form>
+
+    <p class="text-center">Bạn đã có tải khoản?
+      <a class="text-warning text-decoration-none fw-semibold" href="login">
+        Đăng nhập</a>
+    </p>
+  </div>
+</div>

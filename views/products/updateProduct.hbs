@@ -1,0 +1,84 @@
+<div class="container">
+  <h2 style="text-align: center; margin: 25px">SỬA SẢN PHẨM</h2>
+
+  <form method="post" enctype="multipart/form-data">
+  <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">ID :</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          name="id"
+          value="{{itemProduct.id}}"
+          placeholder="Nhập màu sắc"
+          disabled
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Tên sản phẩm :</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          name="name"
+          placeholder="Nhập tên sản phẩm"
+          value="{{itemProduct.name}}"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Giá sản phẩm :</label>
+      <div class="col-sm-10">
+        <input
+          type="number"
+          class="form-control"
+          name="price"
+          value="{{itemProduct.price}}"
+          placeholder="Nhập giá thành"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Loại sản phẩm :</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          name="category"
+          value="{{itemProduct.category}}"
+          placeholder="Nhập loại sản phẩm"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Màu sắc :</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          name="color"
+          value="{{itemProduct.color}}"
+          placeholder="Nhập màu sắc"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Ảnh sản phẩm :</label>
+      <div class="col-sm-10">
+        <input type="file" name="image" accept="image/*" required value="{{itemProduct.image}}"/>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-sm-10">
+      <label class="col-sm-2 col-form-label"></label>
+        <button id="btnSaveUser" type="submit" class="btn btn-primary">Sửa sản
+          phẩm</button>
+      </div>
+    </div>
+  </form>
+</div>
