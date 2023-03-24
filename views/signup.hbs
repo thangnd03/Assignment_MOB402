@@ -6,7 +6,7 @@
     </div>
     {{/if}}
     <h2 class="text-center p-2 bg-success text-white">Đăng ký</h2>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
       <div class="mb-3">
         <label for="email" class="form-label">Email address</label>
         <input
@@ -14,6 +14,7 @@
           class="form-control"
           id="email"
           name="email"
+          value="{{email}}"
           required
         />
       </div>
@@ -24,6 +25,7 @@
           class="form-control"
           id="pass"
           name="pass"
+          value="{{pass}}"
           required
         />
       </div>
@@ -35,6 +37,7 @@
           class="form-control"
           id="name"
           name="name"
+          value="{{name}}"
           required
         />
       </div>

@@ -15,7 +15,7 @@ exports.postAddUser = (req, res, next) => {
     const user = {
         id: users[users.length - 1].id + 1,
         email: req.body.email,
-        pass: req.body.email,
+        pass: req.body.pass,
         name: req.body.name,
         image: req.body.image,
     }
@@ -37,7 +37,7 @@ exports.postEditUser = (req, res, next) => {
     const user = {
         id: req.params.id,
         email: req.body.email,
-        pass: req.body.email,
+        pass: req.body.pass,
         name: req.body.name,
         image: req.body.image,
     }

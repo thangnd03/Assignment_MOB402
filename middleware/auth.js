@@ -21,6 +21,7 @@ const checkLogin = (req, res, next) => {
 
 const checkAccount = (req, res, next) => {
     const { email } = req.body;
+    console.log(email);
     const user = users.find(user => user.email === email);
     if (user) {
         res.render('signup', { layout: 'form', err: 'Thông tin đăng ký đã được sử dụng' })
@@ -36,4 +37,4 @@ const requireLogin = (req, res, next) => {
 
 }
 
-module.exports = { requireLogin, checkLogin, users };
+module.exports = { requireLogin, checkLogin, users, checkAccount };
