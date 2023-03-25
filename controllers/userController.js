@@ -65,3 +65,13 @@ exports.postDeleteUser = (req, res, next) => {
     users = newUsers;
     res.redirect('/user/');
 }
+
+exports.getSearchUser = (req, res, next) => {
+    console.log(req.body.nameSearch);
+    const itemUsers = users.filter((item) => item.name == req.body.nameSearch);
+    console.log(itemUsers);
+    if (itemUsers != null) {
+        res.render("./users/listUser", { listUser: itemUsers });
+    }
+    else { res.send("Không tìm thấy bản ghi"); }
+}

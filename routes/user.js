@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
                 newFileName += ('-' + Date.now() + '.' + arr[i]);
             }
         }
-        req.body.image = 'uploads/' + newFileName;
+        req.body.image = '../uploads/' + newFileName;
         cb(null, newFileName);
     }
 
@@ -28,11 +28,12 @@ const upload = multer({ storage: storage });
 const userController = require('../controllers/userController');
 const { checkAccount } = require('../middleware/auth');
 
+
 /* GET users listing. */
 router.get('/', userController.getListUser);
 
 router.get('/add', userController.getFormAddUser);
-router.post('/add',checkAccount, upload.single('image'), userController.postAddUser);
+router.post('/add', checkAccount, upload.single('image'), userController.postAddUser);
 // xóa
 router.get('/delete/:id', userController.getFormDeleteUser);
 router.post('/delete/:id', userController.postDeleteUser);
@@ -40,5 +41,9 @@ router.post('/delete/:id', userController.postDeleteUser);
 // sửa
 router.get('/edit/:id', userController.getFormEditUser);
 router.post('/edit/:id', userController.postEditUser);
+
+// tìm kiếm
+router.post('/search', userController.getSearchUser);
+
 
 module.exports = router

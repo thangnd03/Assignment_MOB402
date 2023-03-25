@@ -6,7 +6,7 @@ const port = 3000;
 const path = require('path')
 const route = require('./routes/index');
 
-app.use('/static', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static('uploads'));
 
 
 app.use(bodyParser.urlencoded({ extended: false }))
