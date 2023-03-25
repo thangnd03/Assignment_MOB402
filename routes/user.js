@@ -14,7 +14,6 @@ const storage = multer.diskStorage({
             if (i != arr.length - 1) {
                 newFileName += arr[i];
             } else {
-                if (arr[i] != 'jpeg') arr[i] = 'jpeg';
                 newFileName += ('-' + Date.now() + '.' + arr[i]);
             }
         }
@@ -40,7 +39,7 @@ router.post('/delete/:id', userController.postDeleteUser);
 
 // sửa
 router.get('/edit/:id', userController.getFormEditUser);
-router.post('/edit/:id', userController.postEditUser);
+router.post('/edit/:id', upload.single('image'), userController.postEditUser);
 
 // tìm kiếm
 router.post('/search', userController.postSearchUser);

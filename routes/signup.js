@@ -16,7 +16,6 @@ const storage = multer.diskStorage({
             if (i != arr.length - 1) {
                 newFileName += arr[i];
             } else {
-                if (arr[i] != 'jpeg') arr[i] = 'jpeg';
                 newFileName += ('-' + Date.now() + '.' + arr[i]);
             }
         }

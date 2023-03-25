@@ -48,7 +48,7 @@ exports.postEditUser = (req, res, next) => {
         return item;
     })
     users = newUsers;
-    res.redirect('/user/');
+    res.redirect('/user');
 }
 
 // Xóa tài khoản:
@@ -63,7 +63,7 @@ exports.getFormDeleteUser = (req, res, next) => {
 exports.postDeleteUser = (req, res, next) => {
     var newUsers = users.filter((item) => item.id != req.params.id);
     users = newUsers;
-    res.redirect('/user/');
+    res.redirect('/user');
 }
 
 exports.postSearchUser = (req, res, next) => {
