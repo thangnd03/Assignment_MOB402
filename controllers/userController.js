@@ -66,7 +66,7 @@ exports.postDeleteUser = (req, res, next) => {
     res.redirect('/user/');
 }
 
-exports.getSearchUser = (req, res, next) => {
+exports.postSearchUser = (req, res, next) => {
     console.log(req.body.nameSearch);
     const itemUsers = users.filter((item) => item.name == req.body.nameSearch);
     console.log(itemUsers);

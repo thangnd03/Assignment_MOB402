@@ -43,7 +43,7 @@ router.get('/edit/:id', userController.getFormEditUser);
 router.post('/edit/:id', userController.postEditUser);
 
 // tìm kiếm
-router.post('/search', userController.getSearchUser);
+router.post('/search', userController.postSearchUser);
 
 
 module.exports = router
