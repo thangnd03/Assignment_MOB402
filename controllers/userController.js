@@ -1,77 +1,87 @@
-// Lấy danh sách tài khoản
-var { users } = require('../middleware/auth');
+const bcrypt = require('bcrypt');
+const UserModel = require('../model/Users');
+const { multipleMongooseToObject, mongooseToObject } = require('../ultils/mongoose');
+const Users = require('../model/Users');
+const fs = require('fs');
+const path = require('path');
 
-exports.getListUser = (req, res, next) => {
-    const listUser = users.map((item) => item);
-    res.render('./users/listUser', { listUser: listUser });
+exports.getListUser = async (req, res, next) => {
+    console.log(req.user);
+    const listUser = await UserModel.userModel.find();
+    res.render('./users/listUser', { listUser: multipleMongooseToObject(listUser), isAdmin: req.user.roles == "admin" });
 }
-
 // Thêm tài khoản:
 exports.getFormAddUser = (req, res, next) => {
-    res.render('./users/addUser');
-}
-exports.postAddUser = (req, res, next) => {
-    console.log(req.body);
-    const user = {
-        id: users[users.length - 1].id + 1,
-        email: req.body.email,
-        pass: req.body.pass,
-        name: req.body.name,
-        image: req.body.image,
-    }
-    users.push(user);
-    res.redirect('/user/');
+    res.render('./users/addUser', { isAdmin: req.user.roles == "admin" });
 }
 
+exports.postAddUser = async (req, res, next) => {
+    console.log(req.body);
+    try {
+        const salt = await bcrypt.genSalt(15);
+        console.log("Chuoi ngau nhien =  " + salt);
+        // res.send(req.file);
+        const newUser = new UserModel.userModel({
+            email: req.body.email,
+            pass: await bcrypt.hash(req.body.pass, salt),
+            name: req.body.name,
+            image: { data: fs.readFileSync(path.join('uploads/' + req.file.filename)), contentType: req.file.mimetype },
+            roles: 'user'
+        });
+        const token = await newUser.generateAuthToken();
+        console.log(newUser);
+        await UserModel.userModel.insertMany(newUser);
+        fs.unlinkSync(req.file.path);
+        res.redirect('/user');
+    } catch (error) {
+        res.redirect('/user');
+        console.log(error);
+    }
+
+}
+
+exports.getFormEditInfo = async (req, res, next) => {
+    const editUser = await UserModel.userModel.findById(req.user._id);
+    res.render('./users/updateUser', { isAdmin: req.user.roles == "admin", editUser: mongooseToObject(editUser) });
+}
 // Sửa tài khoản
-exports.getFormEditUser = (req, res, next) => {
-    console.log(req.params);
-    let itemUser = users.find((item) => item.id == req.params.id);
-    if (itemUser == null) {
-        res.send('Không tìm thấy bản ghi');
-    }
-    res.render('./users/updateUser', { itemUser: itemUser });
-}
-exports.postEditUser = (req, res, next) => {
+
+exports.postEditUser = async (req, res, next) => {
     console.log(req.body);
-    const user = {
-        id: req.params.id,
-        email: req.body.email,
-        pass: req.body.pass,
-        name: req.body.name,
-        image: req.body.image,
+    console.log(req.params._id);
+    const user = await UserModel.userModel.findById(req.params._id);
+    if (req.pass) {
+        const salt = await bcrypt.genSalt(15);
+        console.log("Chuoi ngau nhien =  " + salt);
+        const pass = await bcrypt.hash(req.body.pass, salt);
+        user.pass = pass;
     }
-    const newUsers = users.map((item) => {
-        if (item.id == user.id) {
-            item = user;
-        }
-        return item;
-    })
-    users = newUsers;
-    res.redirect('/user');
+    user.name = req.body.name;
+    user.roles = req.body.roles;
+    if (req.file) {
+        user.image = { data: fs.readFileSync(path.join('uploads/' + req.file.filename)), contentType: req.file.mimetype };
+        fs.unlinkSync(req.file.path);
+    }
+    await user.save();
+    if (req.user.roles == 'admin') {
+        res.redirect('/user');
+    } else {
+        res.redirect('/home')
+    }
 }
 
-// Xóa tài khoản:
-exports.getFormDeleteUser = (req, res, next) => {
+exports.postDeleteUser = async (req, res, next) => {
     console.log(req.params);
-    let itemUser = users.find((item) => item.id == req.params.id);
-    if (itemUser == null) {
-        res.send("Không tìm thấy bản ghi");
-    }
-    res.render("./users/deleteUser", { itemUser: itemUser });
-}
-exports.postDeleteUser = (req, res, next) => {
-    var newUsers = users.filter((item) => item.id != req.params.id);
-    users = newUsers;
+    await Users.userModel.deleteOne({ _id: req.params._id });
     res.redirect('/user');
 }
 
-exports.postSearchUser = (req, res, next) => {
+exports.postSearchUser = async (req, res, next) => {
     console.log(req.body.nameSearch);
-    const itemUsers = users.filter((item) => item.name == req.body.nameSearch);
-    console.log(itemUsers);
-    if (itemUsers != null) {
-        res.render("./users/listUser", { listUser: itemUsers });
+    const nameSearch = req.body.nameSearch;
+    const userSearch = await Users.userModel.find({ name: { $regex: nameSearch, $options: 'i' } });
+    if (userSearch != null) {
+        res.render("./users/listUser", { listUser: multipleMongooseToObject(userSearch), value: req.body.nameSearch, isAdmin: req.user.roles == "admin" });
     }
-    else { res.send("Không tìm thấy bản ghi"); }
+    else { res.render("./users/listUser", { listUser: [], value: req.body.nameSearch, isAdmin: req.user.roles == "admin" }); }
 }

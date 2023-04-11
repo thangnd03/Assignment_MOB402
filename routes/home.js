@@ -1,9 +1,10 @@
 const express = require('express');
+const { requireLogin } = require('../middleware/auth');
 const router = express.Router();
 
-// Đăng nhập
-router.get('/', (req, res) => {
-    res.render('home',{layout:'main'});
+router.get('/',requireLogin, (req, res) => {
+    res.render('home',{layout:'main',isAdmin:req.user.roles == "admin",user:req.user});
 });
+
 
 module.exports = router;

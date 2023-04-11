@@ -3,7 +3,7 @@
   <h2 style="text-align: center">DANH SÁCH USER</h2>
   <form
     method="POST"
-    action="user/search"
+    action="/user/search"
     accept-charset="UTF-8"
     class="row g-3"
   >
@@ -13,6 +13,7 @@
         class="form-control"
         id="nameSearch"
         name="nameSearch"
+        value="{{value}}"
         placeholder="Tên"
       />
     </div>
@@ -20,7 +21,7 @@
       <button type="submit" class="btn btn-primary mb-3">Search</button>
     </div>
   </form>
-  <table class="table table-bordered table-hover">
+  <table class="table table-bordered border-dark table-hover">
     <thead>
       <tr>
         <th scope="col-1">STT</th>
@@ -36,11 +37,22 @@
           <th scope="row">{{sum @index 1}}</th>
           <td>{{this.email}}</td>
           <td>{{this.name}}</td>
-          <td><img src="{{this.image}}" width="90" alt="ảnh " /></td>
+          <td>
+            <img src="data:{{this.image.contentType}};base64,{{base64 this.image.data}}" class="rounded-circle" style="width:100;height:100" alt="ảnh" />
+          </td>
           <td>
 
-            <a class="btn btn-primary" href="/user/edit/{{this.id}}">Sửa</a>
-            <a class="btn btn-danger" href="/user/delete/{{this.id}}">Xóa</a>
+            <a
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#update-user"
+              data-id="{{this._id}}"
+              data-roles="{{this.roles}}"
+              onclick="rowClicked(this)"
+            >Sửa</a>
+            <a class="btn btn-danger"  data-bs-toggle="modal"
+            data-id="{{this._id}}"
+            data-bs-target="#delete-user">Xóa</a>
 
           </td>
         </tr>
@@ -49,3 +61,160 @@
   </table>
 
 </div>
+
+{{! Model Sửa }}
+
+<div
+  class="modal fade"
+  id="update-user"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Sửa User</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" name="form-update" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="edit-pass" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="edit-pass"
+              name="pass"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="edit-name" class="form-label">Fullname</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit-name"
+              name="name"
+              required
+            />
+          </div>
+
+      <div class="mb-3">
+        <label for="roles" class="form-label">Vai trò</label>
+        <select id="roles" name="roles" class="form-select">
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+        </select>
+      </div>
+
+          <div class="mb-3">
+            <label for="image" class="form-label">Ảnh</label>
+            <input type="file" name="image" accept="image/*"  onchange="previewImage(event)" />
+            <img alt="Avatar" width="100" id="edit-image" />
+          </div>
+
+          <button type="submit" id="btn-edit-user" class="btn btn-success col-12 fs-5">Sửa</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Model Xóa --}}
+
+<div
+  class="modal fade"
+  id="delete-user"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Xóa User</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắc chắn muốn xóa người dùng này?
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >Hủy</button>
+        <button id="btn-delete-user" type="button" class="btn btn-danger">Đồng ý xóa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<form method="post" name="form-delete"></form>
+
+
+<script>
+
+  const myModalEl = document.getElementById('delete-user');
+  const myModelUpdate =document.getElementById('update-user');
+  const deleteForm = document.forms['form-delete'];
+  const updateForm = document.forms['form-update'];
+  const btnDeleteUser = document.getElementById('btn-delete-user');
+  const btnEditUser = document.getElementById('btn-edit-user');
+  var id_user;
+  var roles;
+  myModalEl.addEventListener('show.bs.modal', event => { 
+        var button = event.relatedTarget;
+        console.log(button.getAttribute('data-id'));
+        id_user = button.getAttribute('data-id');
+        
+  });
+  btnDeleteUser.onclick = function(){
+    deleteForm.action ='/user/delete/' + id_user;
+    deleteForm.submit();
+  }
+  function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function() {
+      var output = document.getElementById('edit-image');
+      output.src = reader.result;
+      console.log(output)
+      console.log(reader)
+    }
+    reader.readAsDataURL(event.target.files[0]);
+      console.log(event.target.files[0]); 
+
+  }
+
+  function rowClicked(element){
+    const inputName = document.getElementById('edit-name');
+    const image = document.getElementById('edit-image');
+    const selectRoles = document.getElementById('roles');
+    roles = element.getAttribute('data-roles');
+    selectRoles.querySelectorAll("option").forEach((option) => {
+      option.selected = (option.value == roles);
+    });
+    var row = element.parentNode.parentNode.children;
+    inputName.value = row[2].innerHTML;
+    image.src = row[3].children[0].getAttribute('src');
+    id_user = element.getAttribute('data-id');
+    console.log(id_user);
+  }
+
+  btnEditUser.onclick = function(){
+    updateForm.action ='/user/edit/' + id_user;
+    updateForm.submit();
+  }
+</script>

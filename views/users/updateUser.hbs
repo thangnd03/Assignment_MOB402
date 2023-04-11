@@ -9,8 +9,9 @@
           class="form-control"
           id="email"
           name="email"
-          value="{{itemUser.email}}"
+          value="{{editUser.email}}"
           required
+          disabled
         />
       </div>
       <div class="mb-3">
@@ -20,7 +21,7 @@
           class="form-control"
           id="pass"
           name="pass"
-          value="{{itemUser.pass}}"
+          
           required
         />
       </div>
@@ -32,15 +33,15 @@
           class="form-control"
           id="name"
           name="name"
-          value="{{itemUser.name}}"
+          value="{{editUser.name}}"
           required
         />
       </div>
 
       <div class="mb-3">
         <label for="image" class="form-label">Ảnh</label>
-        <input type="file" name="image" accept="image/*">
-
+        <input type="file" name="image" accept="image/*" />
+        <img src="data:{{editUser.image.contentType}};base64,{{base64 editUser.image.data}}" alt="Avatar" width="100">
       </div>
 
       <button type="submit" class="btn btn-success col-12 fs-5">Sửa</button>

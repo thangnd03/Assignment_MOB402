@@ -1,50 +1,43 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
+const cookieParser = require('cookie-parser');
 const expressHbs = require('express-handlebars');
 const bodyParser = require('body-parser');
+const db = require('./config/db/index');
 const port = 3000;
-const path = require('path')
 const route = require('./routes/index');
+const session = require('express-session');
+const apiRouter   = require('./routes/api');
 
+app.use(cookieParser());
+app.set('trust proxy', 1); // trust first proxy
+
+app.use(session({
+  secret:process.env.KEY_SESSION, // chuỗi ký tự đặc biệt để Session mã hóa, tự viết
+  resave:false,
+  saveUninitialized:false
+}));
+
+db.connect();
 app.use('/uploads', express.static('uploads'));
 
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 app.engine('.hbs', expressHbs.engine({
     extname: '.hbs', helpers: {
-        sum: (a, b) => a + b
+        sum: (a, b) => a + b,
+        base64:(buffer) => {
+            return buffer.toString('base64');
+        }
     }
 }));
 app.set('view engine', '.hbs');
 app.set('views', './views');
 
-
-// app.get('/login', function (req, res) {
-//     res.render('login',{layout:'form'});
-// });
-
-// // Xử lý yêu cầu đăng nhập
-// app.post('/login', function (req, res) {
-//     const username = req.body.username;
-//     const password = req.body.password;
-//     // Kiểm tra tài khoản và mật khẩu
-//     if (username === 'admin' && password === 'admin') {
-//         res.send('Login successful');
-//     } else {
-//         res.send('Login failed');
-//     }
-// });
-
-// app.get('/signup', function (req, res) {
-//     res.render('signup',{layout:'form'});
-// });
-
-// app.get('/',function(req,res){
-//     res.render('home');
-// });
-
+app.use('/api',apiRouter);
 route(app);
 
 app.listen(port, () => {

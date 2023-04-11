@@ -27,20 +27,19 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const productController = require('../controllers/productController');
+const { checkAdmin,checkRole } = require('../middleware/auth');
 
 // Get List Product
-router.get('/', productController.getListProduct);
+router.get('/',checkRole,productController.getListProduct);
 
 // thêm
-router.get('/add', productController.getFormAddProduct);
-router.post('/add', upload.single('image'), productController.postAddProduct);
+router.get('/add',checkAdmin, productController.getFormAddProduct);
+router.post('/add',checkAdmin, upload.single('image'), productController.postAddProduct);
 
 // xóa
-router.get('/delete/:id', productController.getFormDeleteProduct);
-router.post('/delete/:id', productController.postDeleteProduct);
+router.post('/delete/:_id',checkAdmin,productController.postDeleteProduct);
 
 // sửa
-router.get('/edit/:id', productController.getFormEditProduct);
-router.post('/edit/:id',upload.single('image'), productController.postEditProduct);
+router.post('/edit/:_id',checkAdmin,upload.single('image'), productController.postEditProduct);
 
 module.exports = router;

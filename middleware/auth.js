@@ -1,40 +1,62 @@
+const Users = require('../model/Users');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-var users = [
-    { id: 1, email: 'user1@gmail.com', pass: '1', name: 'Nguyễn Văn A', image: "https://avatars.githubusercontent.com/u/1?v=4" },
-    { id: 2, email: 'user2@gmail.com', pass: '1', name: 'Nguyễn Văn B', image: "https://avatars.githubusercontent.com/u/2?v=4" },
-    { id: 3, email: 'user3@gmail.com', pass: '1', name: 'Nguyễn Văn C', image: "https://avatars.githubusercontent.com/u/3?v=4" },
-    { id: 4, email: 'user4@gmail.com', pass: '1', name: 'Nguyễn Văn D', image: "https://avatars.githubusercontent.com/u/4?v=4" },
-];
+const checkLogin = async (req, res, next) => {
+    try {
+        const user = await Users.userModel.findByCredentials(req.body.email, req.body.pass);
+        if (!user) {
+            res.render('login', { layout: 'form', err: 'Thông tin đăng nhập không chính xác', email: email, pass: pass });
+        }
 
-const checkLogin = (req, res, next) => {
-    const { email, pass } = req.body;
-    // Kiểm tra thông tin đăng nhập của người dùng
-    const user = users.find(user => user.email === email && user.pass === pass);
-    if (user) {
-
+        const token = await user.generateAuthToken();// tạo token cho user
+        req.user = user;
+        res.cookie("token", token);
         next();
-    } else {
-        // Đăng nhập thất bại
-        res.render('login', { layout: 'form', err: 'Thông tin đăng nhập không chính xác' })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: error.message });
     }
 };
 
-const checkAccount = (req, res, next) => {
-    const { email } = req.body;
-    console.log(email);
-    const user = users.find(user => user.email === email);
+const checkAccount = async (req, res, next) => {
+    console.log(req.body);
+    const email = req.body.email;
+    const user = await Users.userModel.findOne({ email: email });
     if (user) {
-        res.render('signup', { layout: 'form', err: 'Thông tin đăng ký đã được sử dụng' })
-
+        return res.render('signup', { layout: 'form', err: 'Thông tin đăng ký đã được sử dụng', email: email, pass: req.body.pass, name: req.body.name })
     } else {
         next();
     }
 }
-
-const requireLogin = (req, res, next) => {
-
-    res.redirect('/login');
-
+const checkRole = (req,res,next) =>{
+    if(req.user && (req.user.roles == 'user' || req.user.roles == 'admin')){
+        next();
+    }else{
+        res.status(401).json({ msg: 'Unauthorized' });
+    }
 }
 
-module.exports = { requireLogin, checkLogin, users, checkAccount };
+const checkAdmin = async (req, res, next) => {
+    if (req.user && req.user.roles == 'admin') {
+        next();
+    } else {
+        res.status(401).json({ msg: 'Unauthorized' });
+    }
+}
+
+const requireLogin = async (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token && !req.user) {
+        return res.redirect('/login');
+    }
+    try {
+        const user = req.user || jwt.verify(token, process.env.KEY_SECRET);
+        req.user = user;
+        next();
+    } catch (error) {
+        res.clearCookie("token");
+        res.redirect('/login');
+    }
+}
+module.exports = { requireLogin, checkLogin, checkAccount, checkAdmin,checkRole };

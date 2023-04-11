@@ -2,20 +2,19 @@ const express = require('express');
 const router = express.Router();
 
 const categoryController = require('../controllers/categoryController');
+const { requireLogin } = require('../middleware/auth');
 
 /* GET product listing. */
-router.get('/', categoryController.getListCategory);
+router.get('/',requireLogin, categoryController.getListCategory);
 
 // thêm
-router.get('/add',categoryController.getFormAddCategory);
-router.post('/add',categoryController.postAddCategory);
+router.get('/add',requireLogin,categoryController.getFormAddCategory);
+router.post('/add',requireLogin,categoryController.postAddCategory);
 
 // xóa
-router.get('/delete/:id',categoryController.getFormDeleteCategory);
-router.post('/delete/:id',categoryController.postDeleteCategory);
+router.post('/delete/:id',requireLogin,categoryController.postDeleteCategory);
 
 // sửa
-router.get('/edit/:id',categoryController.getFormEditCategory);
-router.post('/edit/:id',categoryController.postEditCategory);
+router.post('/edit/:id',requireLogin,categoryController.postEditCategory);
 
 module.exports = router;

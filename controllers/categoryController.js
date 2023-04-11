@@ -7,20 +7,20 @@ exports.getListCategory = async (req, res, next) => {
     var listCategory = categories.map((category) => category);
     res.render('./categories/listCategory', {
         listCategory: listCategory,
-        
+        isAdmin: req.user.roles == "admin"
     });
 }
 
 // Thêm sản phẩm
 exports.getFormAddCategory = (req, res, next) => {
-    res.render('./categories/addCategory');
+    res.render('./categories/addCategory', { isAdmin: req.user.roles == "admin" });
 }
 
 exports.postAddCategory = (req, res, next) => {
     console.log(req.body);
     const category = {
-        id:categories[categories.length - 1].id + 1,
-        name:req.body.name,
+        id: categories[categories.length - 1].id + 1,
+        name: req.body.name,
     }
     categories.push(category);
     res.redirect('/category/');
@@ -56,11 +56,11 @@ exports.postEditCategory = (req, res, next) => {
     console.log(req.body);
     console.log(req.params.id);
     const category = {
-        id:req.params.id,
-        name:req.body.name,
+        id: req.params.id,
+        name: req.body.name,
     }
     const newCategories = categories.map((item) => {
-        if(item.id == category.id){
+        if (item.id == category.id) {
             item = category;
         }
         return item;

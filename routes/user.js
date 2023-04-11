@@ -3,46 +3,48 @@ const router = express.Router();
 const multer = require('multer');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-
         cb(null, 'uploads');
     },
     filename: function (req, file, cb) {
-        let fileName = file.originalname; // tên file
-        arr = fileName.split('.');
-        let newFileName = '';
-        for (let i = 0; i < arr.length; i++) {
-            if (i != arr.length - 1) {
-                newFileName += arr[i];
-            } else {
-                newFileName += ('-' + Date.now() + '.' + arr[i]);
-            }
-        }
-        req.body.image = '../uploads/' + newFileName;
-        cb(null, newFileName);
+        cb(null, Date.now() + file.originalname);
     }
 
 });
 
 const upload = multer({ storage: storage });
 const userController = require('../controllers/userController');
-const { checkAccount } = require('../middleware/auth');
+const { checkAccount, requireLogin, checkAdmin, checkRole } = require('../middleware/auth');
 
 
 /* GET users listing. */
-router.get('/', userController.getListUser);
+router.get('/',checkAdmin, userController.getListUser);
 
-router.get('/add', userController.getFormAddUser);
-router.post('/add', checkAccount, upload.single('image'), userController.postAddUser);
+router.get('/add',checkAdmin, userController.getFormAddUser);
+router.post('/add', checkAdmin,checkAccount, upload.single('image'), userController.postAddUser);
+
 // xóa
-router.get('/delete/:id', userController.getFormDeleteUser);
-router.post('/delete/:id', userController.postDeleteUser);
+router.post('/delete/:_id',checkAdmin, userController.postDeleteUser);
 
 // sửa
-router.get('/edit/:id', userController.getFormEditUser);
-router.post('/edit/:id', upload.single('image'), userController.postEditUser);
+router.get('/edit/:_id',checkRole,(req,res,next) => {
+    const currentUser = req.user; // Lấy thông tin người dùng hiện tại
+
+  // Nếu người dùng hiện tại là admin hoặc là chính người dùng được sửa thông tin
+  if (currentUser.roles == "admin" || currentUser._id.toString() == req.params._id) {
+    // Cho phép truy cập vào route sửa thông tin người dùng
+    next();
+  } else {
+    // Người dùng không có quyền truy cập vào route này
+    res.status(403).send('Bạn không có quyền truy cập vào trang này!');
+  }
+},userController.getFormEditInfo);
+router.post('/edit/:_id',checkRole,upload.single('image'), userController.postEditUser);
 
 // tìm kiếm
-router.post('/search', userController.postSearchUser);
+router.get('/search',checkAdmin, userController.getListUser);
+router.post('/search',checkAdmin, userController.postSearchUser);
+
+
 
 
 module.exports = router

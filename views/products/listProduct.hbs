@@ -10,7 +10,9 @@
               <a href="#"><img
                   height="216rem"
                   class="card-img-top"
-                  src="{{this.image}}"
+                  src="data:{{this.image.contenType}};base64,{{base64
+                    this.image.data
+                  }}"
                   alt=""
                 /></a>
               <div class="card-body">
@@ -20,26 +22,35 @@
                     style="text-decoration: none;color:black"
                   >{{this.name}}</a>
                 </h4>
-                <h5>Giá: {{this.price}} đ</h5>
+                <h5>Giá: {{this.price}}đ</h5>
                 <h5>Màu: {{this.color}}</h5>
-                <button class="btn btn-primary" data-bs-toggle="dropdown">
-                  <a style=" text-decoration: none">Quản lý</a>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a
-                      class="dropdown-item"
-                      href="/product/edit/{{this.id}}"
-                    >Sửa</a></li>
-                  <li><a
-                      class="dropdown-item"
-                      href="/product/delete/{{this.id}}"
-                    >Xóa</a></li>
-                </ul>
+                {{#if ../isAdmin}}
+                  <button class="btn btn-primary" data-bs-toggle="dropdown">
+                    <a style=" text-decoration: none">Quản lý</a>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a
+                class="dropdown-item"
+                data-bs-toggle="modal"
+                data-bs-target="#update-product"
+                data-id="{{this._id}}"
+                data-category="{{this.category}}"
+                onclick="rowClicked(this)"
+                >Sửa</a>
+                    </li>
+                    <li><a
+                    data-bs-toggle="modal"
+                    data-id="{{this._id}}"
+                    data-bs-target="#delete-product"
+                        class="dropdown-item"
+                      >Xóa</a></li>
+                  </ul>
+                {{/if}}
               </div>
             </div>
           </div>
         {{/each}}
-
       </div>
       <!-- /.row Product List -->
 
@@ -50,3 +61,193 @@
   <!-- /.row -->
 
 </div>
+
+{{! Model Sửa }}
+
+<div
+  class="modal fade"
+  id="update-product"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Sửa Sản Phẩm</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" name="form-update" enctype="multipart/form-data">
+          
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Tên sản phẩm :</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          name="name"
+          id="edit-name"
+          placeholder="Nhập tên sản phẩm"
+          value="{{itemProduct.name}}"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Giá sản phẩm :</label>
+      <div class="col-sm-10">
+        <input
+          type="number"
+          class="form-control"
+          name="price"
+          id="edit-price"
+          value="{{itemProduct.price}}"
+          placeholder="Nhập giá thành"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Loại sản phẩm :</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          name="category"
+          id="edit-category"
+          value="{{itemProduct.category}}"
+          placeholder="Nhập loại sản phẩm"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Màu sắc :</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          name="color"
+          id="edit-color"
+          value="{{itemProduct.color}}"
+          placeholder="Nhập màu sắc"
+          required
+        />
+      </div>
+    </div>  
+          <div class="mb-3">
+            <label for="image" class="form-label">Ảnh</label>
+            <input type="file" name="image" accept="image/*"  onchange="previewImage(event)" />
+            <img alt="Avatar" width="100" id="edit-image" />
+          </div>
+
+          <button type="submit" id="btn-edit-product" class="btn btn-success col-12 fs-5">Sửa</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{{!-- Model Xóa --}}
+
+<div
+  class="modal fade"
+  id="delete-product"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Xóa Sản Phẩm</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắc chắn muốn xóa sản phẩm này?
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >Hủy</button>
+        <button id="btn-delete-product" type="button" class="btn btn-danger">Đồng ý xóa</button>
+      </div>
+    </div>
+  </div>
+</div>  
+
+<form method="post" name="form-delete"></form>
+
+
+<script>
+
+  const myModalEl = document.getElementById('delete-product');
+  const myModelUpdate =document.getElementById('update-product');
+  const deleteForm = document.forms['form-delete'];
+  const updateForm = document.forms['form-update'];
+  const btnDeleteProduct = document.getElementById('btn-delete-product');
+  const btnEditProduct = document.getElementById('btn-edit-product');
+  var id_product;
+  myModalEl.addEventListener('show.bs.modal', event => { 
+        var button = event.relatedTarget;
+        console.log(button.getAttribute('data-id'));
+        id_product = button.getAttribute('data-id');
+  });
+  btnDeleteProduct.onclick = function(){
+    deleteForm.action ='/product/delete/' + id_product;
+    deleteForm.submit();
+  }
+  function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function() {
+      var output = document.getElementById('edit-image');
+      output.src = reader.result;
+      console.log(output)
+      console.log(reader)
+    }
+    reader.readAsDataURL(event.target.files[0]);
+      console.log(event.target.files[0]); 
+
+  }
+
+  function rowClicked(element){
+    const inputName = document.getElementById('edit-name');
+    const inputPrice = document.getElementById('edit-price');
+    const inputCategory = document.getElementById('edit-category');
+    const inputColor = document.getElementById('edit-color');
+    const image = document.getElementById('edit-image');
+    var header = element.parentNode.parentNode.parentNode;
+    console.log(header.previousElementSibling.firstChild.getAttribute('src'));
+    var row = element.parentNode.parentNode.parentNode.children;
+    console.log(row);
+
+    let price = row[1].innerText;
+    
+    inputName.value = row[0].innerText;
+    inputPrice.value =price.match(/\d+/)[0];;
+    inputCategory.value = element.getAttribute('data-category');
+    inputColor.value = row[2].innerText.split(' ')[1];
+    image.src = header.previousElementSibling.firstChild.getAttribute('src')
+    id_product = element.getAttribute('data-id');
+    console.log(id_product);
+  }
+
+  btnEditProduct.onclick = function(){
+    updateForm.action ='/product/edit/' + id_product;
+    updateForm.submit();
+  }
+</script>
