@@ -7,7 +7,7 @@ const path = require('path');
 
 exports.getListUser = async (req, res, next) => {
     console.log(req.user);
-    const listUser = await UserModel.userModel.find();
+    const listUser = await UserModel.userModel.find({'_id': {$ne : req.user._id}});
     res.render('./users/listUser', { listUser: multipleMongooseToObject(listUser), isAdmin: req.user.roles == "admin" });
 }
 // Thêm tài khoản:

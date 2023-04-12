@@ -20,7 +20,7 @@ router.get('/users', mdw.api_auth ,mdw.api_checkAdmin,api_u.listUser); // ds u: 
 
 router.post('/users/login', api_u.login); // đăng nhập
 
-router.post('/users/reg', api_u.reg); // đăng ký
+router.post('/users/reg',upload.single('image'), api_u.reg); // đăng ký
 
 router.get('/users/profile',mdw.api_auth ,api_u.profile); // lấy thông tin user
 

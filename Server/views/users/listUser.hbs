@@ -38,7 +38,12 @@
           <td>{{this.email}}</td>
           <td>{{this.name}}</td>
           <td>
+            {{#if this.image.contentType}}
             <img src="data:{{this.image.contentType}};base64,{{base64 this.image.data}}" class="rounded-circle" style="width:100;height:100" alt="ảnh" />
+            {{else}}
+            <img src="" class="rounded-circle" style="width:100;height:100" alt="ảnh" />
+
+            {{/if}}
           </td>
           <td>
 

@@ -33,11 +33,14 @@ router.post('/',upload.single('image'),checkAccount, async (req, res,next) => {
         const user = new UserModel.userModel(req.body);
         user.pass = await bcrypt.hash(req.body.pass, salt);
         user.roles = 'user';
-        user.image = {data:fs.readFileSync(path.join('uploads/' + req.file.filename)),contentType:req.file.mimetype};
+        if(req.file){
+            user.image = {data:fs.readFileSync(path.join('uploads/' + req.file.filename)),contentType:req.file.mimetype};
+            fs.unlinkSync(req.file.path);
+        }
         const token = await user.generateAuthToken();
         
         let newUser = await user.save();
-        fs.unlinkSync(req.file.path);
+        
         res.redirect('/login');
     } catch (error) {
         console.log(error);

@@ -1,5 +1,6 @@
 const md = require('../../model/Users');
 const bcrypt = require("bcrypt");
+const { btoa } = require('buffer');
 const fs = require('fs');
 const path = require('path');
 
@@ -32,9 +33,15 @@ exports.login = async (req, res, next) => {
         }
         // đăng nhập thành công, tạo token làm việc mới
         const token = await user.generateAuthToken()
+        
 
-        return res.status(200).json({ user, token })
-
+        return res.status(200).json({ _id:user._id,
+            name:user.name,
+            email:user.email,
+            roles:user.roles,
+            token:token,
+            image:`data:${user.image.contentType};base64,${user.image.data.toString('base64')}`,
+        })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ msg: error.message })
@@ -53,12 +60,15 @@ exports.reg = async (req, res, next) => {
         const user = new md.userModel(req.body);
 
         user.pass = await bcrypt.hash(req.body.pass, salt);
-
+        user.roles = 'user';
+        if(req.file){
+            user.image = { data: fs.readFileSync(path.join('uploads/' + req.file.filename)), contentType: req.file.mimetype }
+        }
         const token = await user.generateAuthToken();
 
         let new_u = await user.save()
 
-        return res.status(201).json({ user: new_u, token })
+        return res.status(201).json({ user:new_u });
 
     } catch (error) {
         console.log(error)
@@ -79,7 +89,7 @@ exports.logout = async (req, res, next) => {
         console.log(req.user);
         // req.user.generateAuthToken();
         req.user.token = null; //xóa token
-        await req.user.save()
+        await req.user.save();
         return res.status(200).json({ msg: 'Đăng xuất thành công' });
     } catch (error) {
         console.log(error);

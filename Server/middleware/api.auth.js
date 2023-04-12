@@ -23,6 +23,7 @@ const api_auth = async (req, res, next) => {
         }
         req.user = user
         req.token = token
+        console.log(req.user);
         next()
     } catch (error) {
         console.log(error);
@@ -33,8 +34,10 @@ const api_auth = async (req, res, next) => {
 
 const api_checkAdmin = async (req, res, next) => {
     if(req.user && req.user.roles == "admin"){
+        console.log(req.user.roles);
         next()
     }else{
+        console.log('không phải admin');
         return res.status(403).json({ msg: 'Bạn không có quyền truy cập' });
     }
 }
