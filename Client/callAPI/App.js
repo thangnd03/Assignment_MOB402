@@ -12,6 +12,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Product from './src/screens/Product';
 import FormProduct from './src/screens/FormProduct';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import User from './src/screens/User';
 
 
 const Stack = createNativeStackNavigator();
@@ -54,6 +55,8 @@ const AppStack = () => {
               : 'home-outline';
           } else if (route.name === 'Product') {
             iconName = focused ? 'list-outline' : 'list-circle-outline';
+          } else if(route.name === 'User'){
+            iconName = focused ? 'people' : 'people-outline';
           }
 
           // You can return any component that you like here!
@@ -66,7 +69,7 @@ const AppStack = () => {
     >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Product" component={ProductStack} />
-
+      <Tab.Screen name="User" component={User}/>
     </Tab.Navigator>
   )
 }

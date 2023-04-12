@@ -2,18 +2,18 @@ import { useIsFocused } from "@react-navigation/native";
 import { useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { API_URL_PRODUCT } from "../../config";
+import { API_URL_PRODUCT, API_URL_USER } from "../../config";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 
-const Product = (props) => {
+const User = (props) => {
     const isFocused = useIsFocused();
     const [isLoading, setIsLoading] = useState(true);
     const { userInfo } = useContext(AuthContext);
     const [data, setData] = useState([]);
 
     const onDelete = (_id) => {
-        fetch(`${API_URL_PRODUCT}/delete/${_id}`,{method:"post",headers:{'Content-Type': 'application/json',Authorization : `Bearer ${userInfo.token}`}})
+        fetch(`${API_URL_USER}/delete/${_id}`,{method:"post",headers:{'Content-Type': 'application/json',Authorization : `Bearer ${userInfo.token}`}})
         .then(res => {
             console.log(res);
             getData()})
@@ -30,15 +30,19 @@ const Product = (props) => {
     }
 
     const getData = () => {
-        axios.get(`${API_URL_PRODUCT}`, {
-            headers: { Authorization: `Bearer ${userInfo.token}` }
-        }).then(res => {
-            
-            setData(res.data.products);
+        fetch(`${API_URL_USER}`,{
+            method:"GET",
+            headers: {Authorization: `Bearer ${userInfo.token}`}
+        })
+        .then(res => res.json())
+        .then(async (data) => {
+            console.log(data);
+            setData(data)
             setIsLoading(false);
-        }).catch(e => {
-            setIsLoading(false)
-            console.log(`getProduct ${e}`);
+        })
+        .catch(err => {
+            setIsLoading(false);
+            console.log(`Get User err ${err}`)
         })
     }
 
@@ -49,7 +53,7 @@ const Product = (props) => {
         <SafeAreaView style={{ backgroundColor: '#E8EAED', flex: 1 }}>
             <View style={{ paddingHorizontal: 8, paddingVertical: 12, marginBottom: 16 }}>
                 <View style={{ paddingHorizontal: 8, flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
-                    <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 4, marginTop: 8, textAlign: 'center' }}>Danh sách sản phẩm</Text>
+                    <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 4, marginTop: 8, textAlign: 'center' }}>Danh sách user</Text>
                     <TouchableOpacity onPress={() =>props.navigation.navigate('FormProduct')}>
                         <View style={{ backgroundColor: "#55BCF6", padding: 4, borderRadius: 10 }}>
                             <Text style={{ color: "white", fontWeight: "bold", textTransform: "uppercase" }}>+Add</Text>
@@ -66,7 +70,7 @@ const Product = (props) => {
                                 <View style={{ flex: 2, marginEnd: 16 }}>
                                     {
                                         item.imageUrl
-                                            ? (<Image style={{ width: 90, height: 90, borderRadius: 5 }} source={{ uri: item.imageUrl }} />)
+                                            ? (<Image style={{ width: 90, height: 90, borderRadius: 5 }} source={{ uri: item.image }} />)
                                             : (<Image style={{ width: 90, height: 90, borderRadius: 5 }} source={require('../../assets/user-profile.jpg')} />)
                                     }
 
@@ -78,16 +82,8 @@ const Product = (props) => {
                                         <Text>{item.name}</Text>
                                     </View>
                                     <View style={{ flexDirection: 'row' }}>
-                                        <Text style={{ fontWeight: 'bold' }}>Price: </Text>
-                                        <Text>{item.price} đ</Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={{ fontWeight: 'bold' }}>Color: </Text>
-                                        <Text>{item.color}</Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={{ fontWeight: 'bold' }}>Category: </Text>
-                                        <Text>{item.category}</Text>
+                                        <Text style={{ fontWeight: 'bold' }}>Email: </Text>
+                                        <Text>{item.email} đ</Text>
                                     </View>
                                 </View>
                                 <View style={{ flex: 2, alignItems: 'flex-end', marginStart: 12 }}>
@@ -96,7 +92,7 @@ const Product = (props) => {
                                             <Image style={{ width: 28, height: 28 }} source={require('../../assets/editing.png')} />
                                         </View>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={{ marginVertical: 8 }} onPress={() => Alert.alert('Xóa sản phẩm', 'Bạn có chắc chắn xóa sản phẩm này không', [
+                                    <TouchableOpacity style={{ marginVertical: 8 }} onPress={() => Alert.alert('Xóa user', 'Bạn có chắc chắn xóa user này không', [
                                         { text: "Cancel" },
                                         { text: "OK", onPress: () => onDelete(item._id) }
                                     ])
@@ -136,4 +132,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Product;
+export default User;

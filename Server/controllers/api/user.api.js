@@ -1,6 +1,5 @@
 const md = require('../../model/Users');
 const bcrypt = require("bcrypt");
-const { btoa } = require('buffer');
 const fs = require('fs');
 const path = require('path');
 
@@ -9,7 +8,13 @@ exports.listUser = async (req, res, next) => {
     try {
         let list = await md.userModel.find();
         if (list) {
-            return res.status(200).json({ data: list, msg: 'Lấy dữ liệu thành công' });
+            const users = list.map((user) => ({
+                _id: user._id,
+                email: user.email,
+                image: user.image,
+                roles: user.roles
+            }));
+            return res.status(200).json({ users });
         } else {
             return res.status(204).json({ msg: 'Không có dữ liệu' });
         }
@@ -33,14 +38,15 @@ exports.login = async (req, res, next) => {
         }
         // đăng nhập thành công, tạo token làm việc mới
         const token = await user.generateAuthToken()
-        
 
-        return res.status(200).json({ _id:user._id,
-            name:user.name,
-            email:user.email,
-            roles:user.roles,
-            token:token,
-            image:`data:${user.image.contentType};base64,${user.image.data.toString('base64')}`,
+
+        return res.status(200).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            roles: user.roles,
+            token: token,
+            image: `data:${user.image.contentType};base64,${user.image.data.toString('base64')}`,
         })
     } catch (error) {
         console.log(error)
@@ -61,14 +67,14 @@ exports.reg = async (req, res, next) => {
 
         user.pass = await bcrypt.hash(req.body.pass, salt);
         user.roles = 'user';
-        if(req.file){
+        if (req.file) {
             user.image = { data: fs.readFileSync(path.join('uploads/' + req.file.filename)), contentType: req.file.mimetype }
         }
         const token = await user.generateAuthToken();
 
         let new_u = await user.save()
 
-        return res.status(201).json({ user:new_u });
+        return res.status(201).json({ user: new_u });
 
     } catch (error) {
         console.log(error)
@@ -122,20 +128,20 @@ exports.updateUser = async (req, res, next) => {
         const userId = req.params._id;
         const user = await md.userModel.findById(userId);
         if (!user) {
-            return res.status(404).json({ msg: 'Không tìm thấy user'});
+            return res.status(404).json({ msg: 'Không tìm thấy user' });
         }
 
         user.email = req.body.email || user.email;
         user.name = req.body.name || user.name;
-        if(req.body.pass){
+        if (req.body.pass) {
             const salt = await bcrypt.genSalt(15);
             user.pass = await bcrypt.hash(req.body.pass, salt)
         }
         user.image = { data: fs.readFileSync(path.join('uploads/' + req.file.filename)), contentType: req.file.mimetype } || user.image;
         user.roles = req.body.roles || user.roles;
-        
+
         const savedUser = await user.save();
-        return res.status(200).json({ data:savedUser,msg: 'Cập nhật thành công' });
+        return res.status(200).json({ data: savedUser, msg: 'Cập nhật thành công' });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ msg: error.message });
@@ -151,6 +157,6 @@ exports.deleteUserById = async (req, res, next) => {
         res.status(200).json({ msg: 'Xóa thành công' });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ msg: error.message });   
+        res.status(500).json({ msg: error.message });
     }
 };

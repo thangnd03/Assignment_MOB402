@@ -41,7 +41,7 @@ router.post('/users/update/:_id',mdw.api_auth,(req,res,next) => {
   }
 },upload.single('image'),api_u.updateUser);
 
-router.post('users/delete/:_id',mdw.api_auth,mdw.api_checkAdmin,api_u.deleteUserById);
+router.post('/users/delete/:_id',mdw.api_auth,mdw.api_checkAdmin,api_u.deleteUserById);
 // api products
 
 router.get('/products',mdw.api_auth,api_p.getAllProducts);
