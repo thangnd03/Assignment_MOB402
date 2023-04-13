@@ -21,6 +21,11 @@ const api_auth = async (req, res, next) => {
         if (!user) {
             throw new Error("Không xác định được người dùng")
         }
+        if(user.image){
+            user.imageUrl = `data:${user.image.contentType};base64,${user.image.data.toString('base64')}`;
+        }else{
+            user.imageUrl = null;
+        }
         req.user = user
         req.token = token
         console.log(req.user);

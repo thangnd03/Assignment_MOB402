@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
             email,pass,image,name
         }).then(res => {
             let user = res.data;
+            console.log(user.imageUrl);
             setUserInfo(user);
             AsyncStorage.setItem('userInfo', JSON.stringify(user));
             setIsLoading(false);

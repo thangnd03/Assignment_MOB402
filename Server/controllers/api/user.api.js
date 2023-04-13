@@ -6,21 +6,21 @@ const path = require('path');
 exports.listUser = async (req, res, next) => {
 
     try {
-        let list = await md.userModel.find();
+        const list = await md.userModel.find();
         if (list) {
             const users = list.map((user) => ({
                 _id: user._id,
                 email: user.email,
-                image: user.image,
+                image: user.image && user.image.data ? `data:${user.image.contentType};base64,${user.image.data.toString('base64')}` : null,
                 roles: user.roles
             }));
-            return res.status(200).json({ users });
+            return res.status(200).json({ users:users });
         } else {
             return res.status(204).json({ msg: 'Không có dữ liệu' });
         }
 
     } catch (error) {
-        return res.status(500).json({ msg: error.message });
+        return res.status(500).json({ msg: `Lỗi getuser ${error.message}` });
     }
     // res.json( {status: 1, msg: 'Trang danh sách user'});
 }
@@ -46,7 +46,7 @@ exports.login = async (req, res, next) => {
             email: user.email,
             roles: user.roles,
             token: token,
-            image: `data:${user.image.contentType};base64,${user.image.data.toString('base64')}`,
+            imageUrl: `data:${user.image.contentType};base64,${user.image.data.toString('base64')}`,
         })
     } catch (error) {
         console.log(error)
@@ -150,6 +150,7 @@ exports.updateUser = async (req, res, next) => {
 
 exports.deleteUserById = async (req, res, next) => {
     try {
+        console.log(req.params._id);
         const user = await md.userModel.findByIdAndDelete(req.params._id);
         if (!user) {
             return res.status(404).json({ msg: 'Không tìm thấy user' });

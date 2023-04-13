@@ -15,7 +15,6 @@ const Product = (props) => {
     const onDelete = (_id) => {
         fetch(`${API_URL_PRODUCT}/delete/${_id}`,{method:"post",headers:{'Content-Type': 'application/json',Authorization : `Bearer ${userInfo.token}`}})
         .then(res => {
-            console.log(res);
             getData()})
         .catch(err => console.log(`Delete product ${err}`));
 

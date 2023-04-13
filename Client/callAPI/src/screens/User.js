@@ -15,7 +15,6 @@ const User = (props) => {
     const onDelete = (_id) => {
         fetch(`${API_URL_USER}/delete/${_id}`,{method:"post",headers:{'Content-Type': 'application/json',Authorization : `Bearer ${userInfo.token}`}})
         .then(res => {
-            console.log(res);
             getData()})
         .catch(err => console.log(`Delete product ${err}`));
 
@@ -30,14 +29,11 @@ const User = (props) => {
     }
 
     const getData = () => {
-        fetch(`${API_URL_USER}`,{
-            method:"GET",
+        axios.get(`${API_URL_USER}`,{
             headers: {Authorization: `Bearer ${userInfo.token}`}
         })
-        .then(res => res.json())
-        .then(async (data) => {
-            console.log(data);
-            setData(data)
+        .then(async(res) => {
+            setData(res.data.users)
             setIsLoading(false);
         })
         .catch(err => {
@@ -69,7 +65,7 @@ const User = (props) => {
                             <View style={styles.item}>
                                 <View style={{ flex: 2, marginEnd: 16 }}>
                                     {
-                                        item.imageUrl
+                                        item.image
                                             ? (<Image style={{ width: 90, height: 90, borderRadius: 5 }} source={{ uri: item.image }} />)
                                             : (<Image style={{ width: 90, height: 90, borderRadius: 5 }} source={require('../../assets/user-profile.jpg')} />)
                                     }
